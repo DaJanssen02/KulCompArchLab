@@ -1,12 +1,7 @@
-/**
- * @file main.c
- * @version 0.1
- *
- */
-
 #include <stdint.h>
 #include <stm32l4xx.h>
 
+dslkjaf;ljdaslk;jf
 
 void delay(unsigned int n){
 	volatile unsigned int delay = n;
