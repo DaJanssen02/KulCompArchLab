@@ -1,15 +1,12 @@
 #include <stdint.h>
 #include <stm32l4xx.h>
 
-
-
 void delay(unsigned int n){
 	volatile unsigned int delay = n;
 	while (delay--);
 }
 
 int main(void) {
-
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOCEN;
 
@@ -35,7 +32,6 @@ int main(void) {
 	GPIOB->PUPDR &= ~GPIO_PUPDR_PUPD14_Msk;
 	GPIOB->PUPDR |= GPIO_PUPDR_PUPD14_0;
 
-
 	while (1) {
 		if (!(GPIOB->IDR  & GPIO_IDR_ID13)) {
 			GPIOC->ODR |= GPIO_ODR_OD13;
@@ -60,6 +56,4 @@ int main(void) {
 			GPIOB->ODR &= ~GPIO_ODR_OD9;
 		}
 	}
-
-
 }
