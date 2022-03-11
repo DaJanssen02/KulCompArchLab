@@ -2,17 +2,27 @@
 #include <stm32l4xx.h>
 
 int mux = 0;
-int array = [];
+int array[4] = {0};
+
+void convert(int getal, char * array){
+	int duizend = getal/1000;
+	 	 getal -= duizend * 1000;
+	int honderd = getal/100;
+	 	 getal -= honderd * 100;
+	int tien = getal/10;
+	  	 getal -= tien * 10;
+	int een = getal/1;
+	 	 getal -= een * 1;
+
+}
 
 
 void delay(unsigned int n){
 	volatile unsigned int delay = n;
 	while (delay--);
-}
-
 
 void multiplexer(int uren, int minuten){
-	if ()
+
 	GPIOA->ODR |= GPIO_ODR_OD8; 			// 00 - 10 - 01 - 11
 	GPIOA->ODR &= ~GPIO_ODR_OD15;
 	seg7(5);
@@ -59,6 +69,8 @@ void seg7(int n){
 int main(void) {
 	int uren = 0;
 	int minuten = 0 ;
+	int getal = (uren * 100) + minuten;
+	convert(getal,array);
 
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
@@ -86,9 +98,11 @@ int main(void) {
 
 
 	while (1) {
+
 		multiplexer(0,0);
 
 
 	}
 
 }
+
