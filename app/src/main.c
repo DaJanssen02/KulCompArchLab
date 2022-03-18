@@ -1,9 +1,10 @@
 #include <stdint.h>
 #include <stm32l4xx.h>
 
-char mux = 0;
-char display[4] = {0};
-
+int mux = 0;
+int minuten = 0;
+int uren = 0;
+int ms = 0;
 
 void delay(unsigned int n){
     volatile unsigned int delay = n;
@@ -15,32 +16,29 @@ void multiplexer(){
     if (mux == 1) {
         GPIOA->ODR &= ~GPIO_ODR_OD8;             // 00 - 10 - 01 - 11
         GPIOA->ODR &= ~GPIO_ODR_OD15;
-        GPIOA->ODR &= ~GPIO_ODR_OD6;
-        seg7(display[0]);
+        seg7(uren/10);
     } else if (mux == 2) {
         GPIOA->ODR |= GPIO_ODR_OD8;             // 00 - 10 - 01 - 11
         GPIOA->ODR &= ~GPIO_ODR_OD15;
         GPIOA->ODR |= GPIO_ODR_OD6;
-        seg7(display[1]);
+        seg7(uren%10);
     } else if (mux == 3) {
         GPIOA->ODR &= ~GPIO_ODR_OD8;             // 00 - 10 - 01 - 11
         GPIOA->ODR |= GPIO_ODR_OD15;
-        GPIOA->ODR &= ~GPIO_ODR_OD6;
-        seg7(display[2]);
+        seg7(minuten/10);
     } else if (mux == 4) {
         GPIOA->ODR |= GPIO_ODR_OD8;             // 00 - 10 - 01 - 11
         GPIOA->ODR |= GPIO_ODR_OD15;
-        GPIOA->ODR &= ~GPIO_ODR_OD6;
-        seg7(display[3]);
+        seg7(minuten%10);
         mux = 0;
     }
-    mux++;
 }
 
 
-void seg7(char n){
+
+void seg7(int n){
     //reset all segments
-    GPIOA->ODR &= ~(GPIO_ODR_OD7 | GPIO_ODR_OD5);
+    GPIOA->ODR &= ~(GPIO_ODR_OD7 | GPIO_ODR_OD5 | GPIO_ODR_OD6);
     GPIOB->ODR &= ~(GPIO_ODR_OD0 | GPIO_ODR_OD12 | GPIO_ODR_OD15 | GPIO_ODR_OD1 | GPIO_ODR_OD2);
 
     //segment  E
@@ -80,18 +78,18 @@ void seg7(char n){
 }
 
 
-void convertNumber(char* display, int number) {
+/*void convertNumber(char* display, int number) {
     char thousand = 0;
     char hunderd = 0;
     char ten = 0;
     char one = 0;
 
     thousand = number / 1000;
-    number -= thousand * 1000;
+    	number -= thousand * 1000;
     hunderd = number / 100;
-    number -= hunderd * 100;
+    	number -= hunderd * 100;
     ten = number / 10;
-    number -= ten * 10;
+    	number -= ten * 10;
     one = number;
 
     display[0] = thousand;
@@ -102,7 +100,7 @@ void convertNumber(char* display, int number) {
 
 void convertTime(char* display, int hours, int minutes) {
     convertNumber(display, hours * 100 + minutes);
-}
+}*/
 
 
 int main(void) {
@@ -137,14 +135,43 @@ int main(void) {
     NVIC_SetPriority(SysTick_IRQn, 128);
     NVIC_EnableIRQ(SysTick_IRQn);
 
-
-    convertTime(display, 11, 45);
     while (1) {
-        multiplexer();
-    }
+		if (!(GPIOB->IDR  & GPIO_IDR_ID13)) {
+			minuten++;
+			if(minuten > 59){
+				minuten = 0;
+			}
+			delay(1000000);
+		}
+
+		if (!(GPIOB->IDR & GPIO_IDR_ID14)){
+			uren++;
+			if(uren > 23){
+				uren = 0;
+			}
+			delay(1000000);
+			}
+	}
+
+
 
 }
 
-void Systick_Handler(void) {
-    //convertTime(display, 11, 45);
+void SysTick_Handler(void) {
+	multiplexer();
+
+    mux++;
+    ms++;
+
+    if(ms == 60000){
+    	ms = 0;
+    	minuten++;
+    	if(minuten>59){
+    		minuten = 0;
+    		uren++;
+    		if(uren > 23){
+    			uren=0;
+    		}
+    	}
+    }
 }
