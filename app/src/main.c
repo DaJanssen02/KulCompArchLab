@@ -4,7 +4,9 @@
 
 int mux = 0;
 int temperatuur = 0;
-int weerstand = 0;
+float weerstand;
+float input;
+float voltage;
 
 void delay(unsigned int n){
     volatile unsigned int delay = n;
@@ -16,22 +18,22 @@ void multiplexer(){
         GPIOA->ODR &= ~GPIO_ODR_OD8;             //00
         GPIOA->ODR &= ~GPIO_ODR_OD15;
         GPIOA->ODR &= ~GPIO_ODR_OD6;
-        seg7(temperatuur/1000);
+        seg7((temperatuur/1000)%10);
     } else if (mux == 2) {
         GPIOA->ODR |= GPIO_ODR_OD8;             //10
         GPIOA->ODR &= ~GPIO_ODR_OD15;
         GPIOA->ODR &= ~GPIO_ODR_OD6;
-        seg7((temperatuur%100));
+        seg7((temperatuur/100)%10);
     } else if (mux == 3) {
         GPIOA->ODR &= ~GPIO_ODR_OD8;             //01
         GPIOA->ODR |= GPIO_ODR_OD15;
         GPIOA->ODR |= GPIO_ODR_OD6;
-        seg7((temperatuur%10));
+        seg7((temperatuur/10)%10);
     } else if (mux == 4) {
         GPIOA->ODR |= GPIO_ODR_OD8;             //11
         GPIOA->ODR |= GPIO_ODR_OD15;
         GPIOA->ODR &= ~GPIO_ODR_OD6;
-        seg7((temperatuur%1));
+        seg7(temperatuur%10);
         mux = 0;
     }
 }
@@ -102,7 +104,7 @@ int main(void) {
 	ADC1->CR |= ADC_CR_ADEN;
 
 	//Kanalen instellen
-	ADC1->SMPR1 |= (ADC_SMPR1_SMP6_0 | ADC_SMPR1_SMP6_1 | ADC_SMPR1_SMP6_2); //111 traagste sample frequentie
+	ADC1->SMPR1 |= (ADC_SMPR1_SMP5_0 | ADC_SMPR1_SMP5_1 | ADC_SMPR1_SMP5_2); //111 traagste sample frequentie
 	ADC1->SQR1 &= ~(ADC_SQR1_L_0 | ADC_SQR1_L_1 | ADC_SQR1_L_2 | ADC_SQR1_L_3);
 	ADC1->SQR1 |= (ADC_SQR1_SQ1_2 | ADC_SQR1_SQ1_0); //00101
 
@@ -133,9 +135,11 @@ int main(void) {
     while (1) {
     	// Start de ADC en wacht tot de sequentie klaar is
     	ADC1->CR |= ADC_CR_ADSTART;
-    	while(!(ADC1->ISR & ADC_ISR_EOS))
-    	temperatuur = ADC1->DR;
-    	//temperatuur = (1.0f/((log(weerstand/10000.0f)/3971.0f)+(1.f/298.15f))-237.15f);
+    	while(!(ADC1->ISR & ADC_ISR_EOS));
+    	float input = ADC1->DR;
+    	float voltage = (input*3.0f)/4096.0f;
+    	float weerstand = (10000.0f*voltage)/(3.0f-voltage);
+    	temperatuur = ((1.0f/((logf(weerstand/10000.0f)/3936.0f)+(1.0f/298.15f)))-273.15f)*10;
 	}
 }
 
