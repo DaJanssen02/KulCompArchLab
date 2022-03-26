@@ -94,7 +94,7 @@ int main(void) {
     GPIOB->PUPDR &= ~(GPIO_PUPDR_PUPD13_Msk | GPIO_PUPDR_PUPD14_Msk);
     GPIOB->PUPDR |= (GPIO_PUPDR_PUPD13_0 | GPIO_PUPDR_PUPD14_0);
 
-    //systick configereren en interupt aanzetten
+    //systick configureren en interupt aanzetten
     SysTick_Config(48000);
     NVIC_SetPriority(SysTick_IRQn, 128);
     NVIC_EnableIRQ(SysTick_IRQn);
