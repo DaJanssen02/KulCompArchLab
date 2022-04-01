@@ -22,12 +22,12 @@ void multiplexer(){
     } else if (mux == 2) {
         GPIOA->ODR |= GPIO_ODR_OD8;             //10
         GPIOA->ODR &= ~GPIO_ODR_OD15;
-        GPIOA->ODR &= ~GPIO_ODR_OD6;
+        GPIOA->ODR |= GPIO_ODR_OD6;
         seg7((temperatuur/100)%10);
     } else if (mux == 3) {
         GPIOA->ODR &= ~GPIO_ODR_OD8;             //01
         GPIOA->ODR |= GPIO_ODR_OD15;
-        GPIOA->ODR |= GPIO_ODR_OD6;
+        GPIOA->ODR &= ~GPIO_ODR_OD6;
         seg7((temperatuur/10)%10);
     } else if (mux == 4) {
         GPIOA->ODR |= GPIO_ODR_OD8;             //11
@@ -139,7 +139,7 @@ int main(void) {
     	float input = ADC1->DR;
     	float voltage = (input*3.0f)/4096.0f;
     	float weerstand = (10000.0f*voltage)/(3.0f-voltage);
-    	temperatuur = ((1.0f/((logf(weerstand/10000.0f)/3936.0f)+(1.0f/298.15f)))-273.15f)*10;
+    	temperatuur = ((1.0f/((logf(weerstand/10000.0f)/3936.0f)+(1.0f/298.15f)))-273.15f)*100;
 	}
 }
 
