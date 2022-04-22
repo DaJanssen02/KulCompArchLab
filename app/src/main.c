@@ -18,6 +18,12 @@ int __io_putchar(int ch){
 		}
 
 int main(void) {
+	// Klok aanzetten
+	RCC->AHB2ENR |= RCC_AHB2ENR_ADCEN;
+
+	// Klok selecteren, hier gebruiken we sysclk
+	RCC->CCIPR &= ~RCC_CCIPR_ADCSEL_Msk;
+	RCC->CCIPR |= RCC_CCIPR_ADCSEL_0 | RCC_CCIPR_ADCSEL_1;
 
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 	RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
