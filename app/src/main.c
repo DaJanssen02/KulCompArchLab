@@ -9,6 +9,8 @@ float inputpot;
 float inputweerstand;
 float voltage;
 
+
+
 void delay(unsigned int n){
     volatile unsigned int delay = n;
     while (delay--);
@@ -157,24 +159,25 @@ int main(void) {
     	// Start de ADC en wacht tot de sequentie klaar is
 
 
-		ADC1->SQR1 |= (ADC_SQR1_SQ1_2 | ADC_SQR1_SQ1_1); //00110
-		ADC1->SQR1 &= ~(ADC_SQR1_SQ1_0|ADC_SQR1_SQ1_3|ADC_SQR1_SQ1_4);
+    	ADC1->SQR1 |= (ADC_SQR1_SQ1_2 | ADC_SQR1_SQ1_1); //00110
+    	ADC1->SQR1 &= ~(ADC_SQR1_SQ1_0|ADC_SQR1_SQ1_3|ADC_SQR1_SQ1_4);
 		ADC1->CR |= ADC_CR_ADSTART;
-		while(!(ADC1->ISR & ADC_ISR_EOS));
+		while(!(ADC1->ISR & ADC_ISR_EOC));
 		float inputpot = ADC1->DR;
 		delay(1000);
+
 
 		ADC1->SQR1 |= (ADC_SQR1_SQ1_2 | ADC_SQR1_SQ1_0); //00101
 		ADC1->SQR1 &= ~(ADC_SQR1_SQ1_1|ADC_SQR1_SQ1_3|ADC_SQR1_SQ1_4);
     	ADC1->CR |= ADC_CR_ADSTART;
-    	while(!(ADC1->ISR & ADC_ISR_EOS));
+    	while(!(ADC1->ISR & ADC_ISR_EOC));
     	float inputweerstand = ADC1->DR;
-    	float voltage = (inputpot*3.0f)/4096.0f;
+    	float voltage = (inputweerstand*3.0f)/4096.0f;
     	float weerstand = (10000.0f*voltage)/(3.0f-voltage);
     	temperatuur = ((1.0f/((logf(weerstand/10000.0f)/3936.0f)+(1.0f/298.15f)))-273.15f)*100;
     	delay(1000);
 
-    	if (inputweerstand > inputpot){
+    	if (inputpot > inputweerstand){  //ntc werkt geinverteerd -> als de weerstand verhoogt gaat de spanning afnemen
     		TIM16->BDTR |= TIM_BDTR_MOE;
     	}
     	else{
