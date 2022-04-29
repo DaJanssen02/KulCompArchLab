@@ -9,6 +9,13 @@ float inputpot;
 float inputweerstand;
 float voltage;
 
+int A = 27273;
+int B = 24296;
+int C = 45863;
+int D = 40886;
+int E = 36402;
+int F = 34359;
+int G = 30621;
 
 
 void delay(unsigned int n){
@@ -144,9 +151,7 @@ int main(void) {
 	GPIOB->OTYPER &= ~GPIO_OTYPER_OT8;
 	GPIOB->AFR[1] = (GPIOB->AFR[1] & (~GPIO_AFRH_AFSEL8_Msk)) | (0xE << GPIO_AFRH_AFSEL8_Pos);
 
-	TIM16->PSC = 0;
-	TIM16->ARR = 24000;
-	TIM16->CCR1 = 12000;
+
 
 	TIM16->CCMR1 &= ~TIM_CCMR1_CC1S;
 	TIM16->CCMR1 |= TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1FE;
@@ -155,8 +160,267 @@ int main(void) {
 	TIM16->CR1 |= TIM_CR1_CEN;
 
 
+
     while (1) {
     	// Start de ADC en wacht tot de sequentie klaar is
+
+    	TIM16->PSC = 0;		//A
+    	TIM16->ARR = A;
+    	TIM16->CCR1 = A/2;
+    	delay(1000000);
+
+    	TIM16->ARR = C;		//C
+    	TIM16->CCR1 = C/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = E;		//E
+    	TIM16->CCR1 = E/2;
+    	delay(1000000);
+
+    	TIM16->ARR = F;		//F
+    	TIM16->CCR1 = F/2;
+    	delay(1000000);
+
+    	TIM16->ARR = F;		//F
+    	TIM16->CCR1 = F/2;
+    	delay(1000000);
+
+    	TIM16->ARR = F;		//F
+    	TIM16->CCR1 = F/2;
+    	delay(1000000);
+
+    	TIM16->ARR = G;		//G
+    	TIM16->CCR1 = G/2;
+    	delay(1000000);
+
+    	TIM16->ARR = E;		//E
+    	TIM16->CCR1 = E/2;
+    	delay(1000000);
+
+    	TIM16->ARR = E;		//E
+    	TIM16->CCR1 = E/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = C;		//C
+    	TIM16->CCR1 = C/2;
+    	delay(1000000);
+
+    	TIM16->ARR = C;		//C
+    	TIM16->CCR1 = C/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = A;		//A
+    	TIM16->CCR1 = A;
+    	delay(1000000);
+
+    	TIM16->ARR = C;		//C
+    	TIM16->CCR1 = C/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = E;		//E
+    	TIM16->CCR1 = E/2;
+    	delay(1000000);
+
+    	TIM16->ARR = F;		//F
+    	TIM16->CCR1 = F/2;
+    	delay(1000000);
+
+    	TIM16->ARR = F;		//F
+    	TIM16->CCR1 = F/2;
+    	delay(1000000);
+
+    	TIM16->ARR = F;		//F
+    	TIM16->CCR1 = F/2;
+    	delay(1000000);
+
+    	TIM16->ARR = G;		//G
+    	TIM16->CCR1 = G/2;
+    	delay(1000000);
+
+    	TIM16->ARR = E;		//E
+    	TIM16->CCR1 = E/2;
+    	delay(1000000);
+
+    	TIM16->ARR = E;		//E
+    	TIM16->CCR1 = E/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = C;		//C
+    	TIM16->CCR1 = C/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = A;		//A
+    	TIM16->CCR1 = A;
+    	delay(1000000);
+
+    	TIM16->ARR = C;		//C
+    	TIM16->CCR1 = C/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = F;		//F
+    	TIM16->CCR1 = F/2;
+    	delay(1000000);
+
+    	TIM16->ARR = G;		//G
+    	TIM16->CCR1 = G/2;
+    	delay(1000000);
+
+    	TIM16->ARR = G;		//G
+    	TIM16->CCR1 = G/2;
+    	delay(1000000);
+
+    	TIM16->ARR = G;		//G
+    	TIM16->CCR1 = G/2;
+    	delay(1000000);
+
+    	TIM16->ARR = A;		//A
+    	TIM16->CCR1 = A;
+    	delay(1000000);
+
+    	TIM16->ARR = B;		//B
+    	TIM16->CCR1 = B/2;
+    	delay(1000000);
+
+    	TIM16->ARR = B;		//B
+    	TIM16->CCR1 = B/2;
+    	delay(1000000);
+
+    	TIM16->ARR = A;		//A
+    	TIM16->CCR1 = A;
+    	delay(1000000);
+
+    	TIM16->ARR = G;		//G
+    	TIM16->CCR1 = G/2;
+    	delay(1000000);
+
+    	TIM16->ARR = A;		//A
+    	TIM16->CCR1 = A;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = E;		//E
+    	TIM16->CCR1 = E/2;
+    	delay(1000000);
+
+    	TIM16->ARR = F;		//F
+    	TIM16->CCR1 = F/2;
+    	delay(1000000);
+
+    	TIM16->ARR = F;		//F
+    	TIM16->CCR1 = F/2;
+    	delay(1000000);
+
+    	TIM16->ARR = G;		//G
+    	TIM16->CCR1 = G/2;
+    	delay(1000000);
+
+    	TIM16->ARR = A;		//A
+    	TIM16->CCR1 = A/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = F;		//F
+    	TIM16->CCR1 = F/2;
+    	delay(1000000);
+
+    	TIM16->ARR = E;		//E
+    	TIM16->CCR1 = E/2;
+    	delay(1000000);
+
+    	TIM16->ARR = E;		//E
+    	TIM16->CCR1 = E/2;
+    	delay(1000000);
+
+    	TIM16->ARR = F;		//F
+    	TIM16->CCR1 = F/2;
+    	delay(1000000);
+
+    	TIM16->ARR = D;		//D
+    	TIM16->CCR1 = D/2;
+    	delay(1000000);
+
+    	TIM16->ARR = E;		//E
+    	TIM16->CCR1 = E/2;
+    	delay(1000000);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     	ADC1->SQR1 |= (ADC_SQR1_SQ1_2 | ADC_SQR1_SQ1_1); //00110
