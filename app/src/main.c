@@ -9,14 +9,30 @@ float inputpot;
 float inputweerstand;
 float voltage;
 
-int A = 27273;
-int B = 24296;
-int C = 45863;
-int D = 40886;
-int E = 36402;
-int F = 34359;
-int G = 30621;
+const int A = 27273;
+const int B = 24296;
+const int C = 45863;
+const int D = 40886;
+const int E = 36402;
+const int F = 34359;
+const int G = 30621;
+const int N = 1000;
 
+array[202] = {A,N,C,N,D,N,D,N,D,E,N,F,N,F,
+		F,G,N,N,E,N,E,N,D,C,N,C,N,D,
+		A,N,C,N,D,N,D,N,D,E,N,F,N,F,
+		F,G,N,N,E,N,E,N,D,C,N,D,
+		A,N,C,N,D,N,D,N,N,D,F,N,G,N,G,
+		G,A,N,N,B,B,N,A,G,N,A,N,D,
+		D,E,N,F,N,F,N,G,N,N,A,D,
+		D,F,N,E,N,E,N,F,D,N,E,
+		A,C,N,D,N,D,N,N,D,E,N,N,F,N,N,F,
+		F,N,G,N,N,E,N,N,E,N,N,D,N,C,N,N,C,N,N,D,
+		A,C,N,D,N,D,N,N,D,E,N,N,F,N,N,F,
+		F,N,G,N,N,E,N,N,E,N,N,D,N,C,N,N,D,
+		A,C,N,N,N,D,N,N,D,N,N,N,D,F,N,G,N,G,
+		G,A,N,B,B,N,A,G,N,A,D
+		};
 
 void delay(unsigned int n){
     volatile unsigned int delay = n;
@@ -163,7 +179,14 @@ int main(void) {
 
     while (1) {
     	// Start de ADC en wacht tot de sequentie klaar is
+    	TIM16->PSC = 0;
+    	for (int i=0; i<100; i++){
+    		TIM16->ARR = array[i];
+    		TIM16->CCR1 = array[i]/2;
+    		delay(900000);
+    	}
 
+    	/*
     	TIM16->PSC = 0;		//A
     	TIM16->ARR = A;
     	TIM16->CCR1 = A/2;
@@ -409,7 +432,7 @@ int main(void) {
     	TIM16->CCR1 = E/2;
     	delay(1000000);
 
-
+		*/
 
 
 
