@@ -97,7 +97,8 @@ int main(void) {
 	GPIOA->MODER |= GPIO_MODER_MODE0_0 | GPIO_MODER_MODE0_1;
 
 	while (1) {
-		printf("temperatuur %2.2f\r\n",temperatuur);
+		printf("T=%2.1f",temperatuur);
+		printf("°C\r\n");
 
 		ADC1->SQR1 |= (ADC_SQR1_SQ1_2 | ADC_SQR1_SQ1_0); //00101
 		ADC1->SQR1 &= ~(ADC_SQR1_SQ1_1|ADC_SQR1_SQ1_3|ADC_SQR1_SQ1_4);
@@ -108,7 +109,7 @@ int main(void) {
 		float weerstand = (10000.0f*voltage)/(3.0f-voltage);
 		temperatuur = ((1.0f/((logf(weerstand/10000.0f)/3936.0f)+(1.0f/298.15f)))-273.15f);
 
-		delay(1000000);
+		delay(7000000);
 
 
 	}
