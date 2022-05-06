@@ -8,7 +8,7 @@ Het doel van dit labo is om de ADC te leren gebruiken en de mogelijkheden te bek
 
 📌 **RM373**
 
-De microcontroller bevat twee 12-bit ADC's. Deze twee ADC's hebben elk de mogelijkheid om 18 kanelen te bemosteren.
+De microcontroller bevat twee 12-bit ADC's. Deze twee ADC's hebben elk de mogelijkheid om 18 kanalen te bemosteren.
 
 ![ADC blokdiagramma](img/rm_adc.PNG)
 
@@ -61,12 +61,12 @@ Om de ADC te configureren voor basisfunctionaliteit, moeten de volgende stappen 
 		ADC1->CR |= ADC_CR_ADCAL;
 		while(ADC1->CR & ADC_CR_ADCAL);
 
-6. ADC aanzetten en de kanelen configureren. 
+6. ADC aanzetten en de kanalen configureren. 
 
 		// ADC aanzetten
 		ADC1->CR |= ADC_CR_ADEN;
 
-		// Kanelen instellen
+		// kanalen instellen
 		ADC1->SMPR1 = ....
 		ADC1->SQR1 = ....
 
