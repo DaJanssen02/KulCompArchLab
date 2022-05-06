@@ -111,12 +111,12 @@ int main(void) {
 	//Klok selecteren, hier gebruiken we sysclk
 	RCC->CCIPR &= ~RCC_CCIPR_ADCSEL_Msk;
 	RCC->CCIPR |= RCC_CCIPR_ADCSEL_0 | RCC_CCIPR_ADCSEL_1;
+	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
+    RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
 
 
 	//Deep powerdown modus uitzetten
 	ADC1->CR &= ~ADC_CR_DEEPPWD;
-
-
 
 	//ADC voltage regulator aanzetten
 	ADC1->CR |= ADC_CR_ADVREGEN;
@@ -131,7 +131,6 @@ int main(void) {
 	ADC1->CR |= ADC_CR_ADEN;
 
 	//Timer
-	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
 	RCC->APB2ENR |= RCC_APB2ENR_TIM16EN;
 
 	//kanalen instellen
@@ -140,9 +139,6 @@ int main(void) {
 	ADC1->SQR1 &= ~(ADC_SQR1_L_0 | ADC_SQR1_L_1 | ADC_SQR1_L_2 | ADC_SQR1_L_3);
 
 
-
-	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
-    RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
 
     // 7 segmenten aanzetten (als output declareren) en laag maken
     GPIOA->MODER &= ~(GPIO_MODER_MODE7_Msk | GPIO_MODER_MODE5_Msk);
@@ -162,11 +158,11 @@ int main(void) {
 	GPIOA->MODER &= ~GPIO_MODER_MODE0_Msk;
 	GPIOA->MODER |= GPIO_MODER_MODE0_0 | GPIO_MODER_MODE0_1;
 
+	//timer
 	GPIOB->MODER &= ~GPIO_MODER_MODE8_Msk;
-	GPIOB->MODER |= GPIO_MODER_MODE8_1;
+	GPIOB->MODER |= GPIO_MODER_MODE8_1;  		//10 alternate mode
 	GPIOB->OTYPER &= ~GPIO_OTYPER_OT8;
 	GPIOB->AFR[1] = (GPIOB->AFR[1] & (~GPIO_AFRH_AFSEL8_Msk)) | (0xE << GPIO_AFRH_AFSEL8_Pos);
-
 
 
 	TIM16->CCMR1 &= ~TIM_CCMR1_CC1S;
