@@ -6,6 +6,7 @@ void delay(unsigned int n){
 	while (delay--);
 }
 
+//initialisatie van de temperatuur
 float temperatuur = 0;
 
 int __io_putchar(int ch){
@@ -18,13 +19,11 @@ int main(void) {
 	RCC->AHB2ENR |= RCC_AHB2ENR_ADCEN;
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
+	RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
 
 	// Klok selecteren, hier gebruiken we sysclk
 	RCC->CCIPR &= ~RCC_CCIPR_ADCSEL_Msk;
 	RCC->CCIPR |= RCC_CCIPR_ADCSEL_0 | RCC_CCIPR_ADCSEL_1;
-
-	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
-	RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
 
 	GPIOA->MODER &= ~GPIO_MODER_MODE9_Msk;
 	GPIOA->MODER |=  GPIO_MODER_MODE9_1;
@@ -72,7 +71,6 @@ int main(void) {
 	while (1) {
 		printf("T=%2.1f",temperatuur);
 		printf("°C\r\n");
-
 		ADC1->SQR1 |= (ADC_SQR1_SQ1_2 | ADC_SQR1_SQ1_0); //00101
 		ADC1->SQR1 &= ~(ADC_SQR1_SQ1_1|ADC_SQR1_SQ1_3|ADC_SQR1_SQ1_4);
 		ADC1->CR |= ADC_CR_ADSTART;
