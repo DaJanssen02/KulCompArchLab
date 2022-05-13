@@ -73,6 +73,53 @@ void seg7(int n){
     }
 }
 
+void write_accel(int data, int reg){
+	    I2C1->CR2 &= ~(1<<10);//enable write mode
+	    I2C1->CR2 |=  (2 << 16)|(0x1D << 1); //grote te verzende paket, conencted device,
+	    while(I2C1->ISR & (1<<4) == 0  I2C1->ISR & (1<<1) == 0);
+	     //NACKF = 0, TXIS = 0
+	    if(I2C1->ISR & (1<<4) != 0){ //NACKF = 1
+	        return;
+	    }
+
+	    I2C1->TXDR = reg;//register doorsturen
+
+	    while(I2C1->ISR & (1<<4) == 0  I2C1->ISR & (1<<1) == 0){};
+	         //NACKF = 0, TXIS = 0
+	    if(I2C1->ISR & (1<<4) != 0){ //NACKF = 1
+	        return;
+	    }
+	    I2C1->CR2 |= (1<<13);
+	    I2C1->TXDR = data;
+	}
+
+int read_accel(int reg){
+	I2C1->CR2 &= ~(1<<10);//enable write mode
+	I2C1->CR2 &= ~I2C_CR2_AUTOEND_Msk;
+	I2C1->CR2 |=  (1 << 16)|(0x1D << 1); //grote te verzende paket, conencted device,
+	while(I2C1->ISR & (1<<4) == 0 || I2C1->ISR & (1<<1) == 0){};
+	 //NACKF = 0, TXIS = 0
+	if(I2C1->ISR & (1<<4) != 0){ //NACKF = 1
+		return;
+	}
+
+	I2C1->TXDR = reg;//register doorsturen
+	while(I2C1_ISR & (1<<6) == 0);
+
+
+	I2C1->CR2 |= I2C_CR2_AUTOEND_Msk;
+	I2C1->CR2 |= (1<<10);//enable read mode
+	//read
+	I2C1->CR2 |=  (1 << 16)|(0x1D << 1); //grote te verzende paket, conencted device,
+	I2C->CR2 |= (1<<13);
+	while(!(I2C1->ISR & I2C_ISR_RXNE));
+
+	return I2C1->RXDR;
+
+}
+
+
+
 int main(void) {
 	//Klok aanzetten
 	RCC->AHB2ENR |= RCC_AHB2ENR_ADCEN;
@@ -145,9 +192,17 @@ int main(void) {
 	I2C1->CR1 |= I2C_CR1_PE;
 
 
+
+
+
+
     while (1) {
     	// Start de ADC en wacht tot de sequentie klaar is
-    	I2C1->CR1 |= I2C_CR1_CRSTART;
+
+    	//I2C_CR2.START
+
+    	//I2C1->CR1 |= I2C_CR1_CRSTART;
+
     	while(!(ADC1->ISR & ADC_ISR_EOS));
     	float input = ADC1->DR;
     	float voltage = (input*3.0f)/4096.0f;
@@ -160,5 +215,6 @@ void SysTick_Handler(void) {
 	multiplexer();
     mux++;
 }
+
 
 
