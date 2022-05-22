@@ -7,6 +7,7 @@ int temperatuur = 0;
 float weerstand;
 float input;
 float voltage;
+double hoek = 0;
 
 void delay(unsigned int n){
     volatile unsigned int delay = n;
@@ -18,22 +19,22 @@ void multiplexer(){
         GPIOA->ODR &= ~GPIO_ODR_OD8;             //00
         GPIOA->ODR &= ~GPIO_ODR_OD15;
         GPIOA->ODR &= ~GPIO_ODR_OD6;
-        seg7((temperatuur/1000)%10);
+        seg7((int)hoek/10);
     } else if (mux == 2) {
         GPIOA->ODR |= GPIO_ODR_OD8;             //10
         GPIOA->ODR &= ~GPIO_ODR_OD15;
         GPIOA->ODR |= GPIO_ODR_OD6;
-        seg7((temperatuur/100)%10);
+        seg7(((int)hoek)%10);
     } else if (mux == 3) {
         GPIOA->ODR &= ~GPIO_ODR_OD8;             //01
         GPIOA->ODR |= GPIO_ODR_OD15;
         GPIOA->ODR &= ~GPIO_ODR_OD6;
-        seg7((temperatuur/10)%10);
+        seg7(((int)hoek*10)%10);
     } else if (mux == 4) {
         GPIOA->ODR |= GPIO_ODR_OD8;             //11
         GPIOA->ODR |= GPIO_ODR_OD15;
         GPIOA->ODR &= ~GPIO_ODR_OD6;
-        seg7(temperatuur%10);
+        seg7(((int)hoek*100)%10);
         mux = 0;
     }
 }
@@ -75,43 +76,47 @@ void seg7(int n){
 
 void write_accel(int data, int reg){
 	    I2C1->CR2 &= ~(1<<10);//enable write mode
-	    I2C1->CR2 |=  (2 << 16)|(0x1D << 1); //grote te verzende paket, conencted device,
-	    while(I2C1->ISR & (1<<4) == 0  I2C1->ISR & (1<<1) == 0);
+		I2C1->CR2 |= I2C_CR2_NACK_Msk;
+	    I2C1->CR2 |=  (1 << 13)|(2 << 16)|(0x53 << 1); //grote te verzende paket, conencted device,
+	    while((I2C1->ISR & (1<<4)) == 0 && (I2C1->ISR & (1<<1)) == 0);
 	     //NACKF = 0, TXIS = 0
-	    if(I2C1->ISR & (1<<4) != 0){ //NACKF = 1
+	    if((I2C1->ISR & (1<<4)) != 0){ //NACKF = 1
 	        return;
 	    }
 
 	    I2C1->TXDR = reg;//register doorsturen
 
-	    while(I2C1->ISR & (1<<4) == 0  I2C1->ISR & (1<<1) == 0){};
+	    while(I2C1->ISR & (1<<4) == 0 && I2C1->ISR & (1<<1) == 0){};
 	         //NACKF = 0, TXIS = 0
-	    if(I2C1->ISR & (1<<4) != 0){ //NACKF = 1
+	    if((I2C1->ISR & (1<<4)) != 0){ //NACKF = 1
 	        return;
 	    }
-	    I2C1->CR2 |= (1<<13);
 	    I2C1->TXDR = data;
-	}
+		while((I2C1->ISR & I2C_ISR_STOPF) == 0);
+}
 
 int read_accel(int reg){
+	while((I2C1->ISR & I2C_ISR_BUSY));
 	I2C1->CR2 &= ~(1<<10);//enable write mode
 	I2C1->CR2 &= ~I2C_CR2_AUTOEND_Msk;
-	I2C1->CR2 |=  (1 << 16)|(0x1D << 1); //grote te verzende paket, conencted device,
-	while(I2C1->ISR & (1<<4) == 0 || I2C1->ISR & (1<<1) == 0){};
+	I2C1->CR2 &= ~I2C_CR2_NBYTES_Msk;
+	I2C1->CR2 |= I2C_CR2_NACK_Msk;
+	I2C1->CR2 |=  (1 << 13)|(1 << 16)|(0x53 << 1); //grote te verzende paket, conencted device,
+	while(((I2C1->ISR & (1<<4)) == 0) && ((I2C1->ISR & (1<<1)) == 0)){};
 	 //NACKF = 0, TXIS = 0
-	if(I2C1->ISR & (1<<4) != 0){ //NACKF = 1
+	if((I2C1->ISR & (1<<4)) != 0){ //NACKF = 1
 		return;
 	}
 
 	I2C1->TXDR = reg;//register doorsturen
-	while(I2C1_ISR & (1<<6) == 0);
+	while((I2C1->ISR & (1<<6)) == 0);
 
 
 	I2C1->CR2 |= I2C_CR2_AUTOEND_Msk;
 	I2C1->CR2 |= (1<<10);//enable read mode
 	//read
-	I2C1->CR2 |=  (1 << 16)|(0x1D << 1); //grote te verzende paket, conencted device,
-	I2C->CR2 |= (1<<13);
+	I2C1->CR2 |=  (1 << 16)|(0x53 << 1); //grote te verzende paket, conencted device,
+	I2C1->CR2 |= (1<<13);
 	while(!(I2C1->ISR & I2C_ISR_RXNE));
 
 	return I2C1->RXDR;
@@ -196,6 +201,9 @@ int main(void) {
 
 
 
+	volatile int16_t array[3];
+	write_accel(1<<3,0x2D);
+	array[0] =  read_accel(0x2D);
     while (1) {
     	// Start de ADC en wacht tot de sequentie klaar is
 
@@ -203,11 +211,21 @@ int main(void) {
 
     	//I2C1->CR1 |= I2C_CR1_CRSTART;
 
-    	while(!(ADC1->ISR & ADC_ISR_EOS));
+    	//while(!(ADC1->ISR & ADC_ISR_EOS));
     	float input = ADC1->DR;
     	float voltage = (input*3.0f)/4096.0f;
     	float weerstand = (10000.0f*voltage)/(3.0f-voltage);
     	temperatuur = ((1.0f/((logf(weerstand/10000.0f)/3936.0f)+(1.0f/298.15f)))-273.15f)*100;
+    	for (int i = 0; i<3; i++){
+    		array[i] = read_accel(0x32+i*2)<<8+read_accel(0x32+i*2+1);
+    	}
+
+    	int xy = sqrt(array[0]^2+array[1]^2);
+    	int xyz = sqrt(xy^2+array[2]^2);
+    	//hoek = xyz;
+
+    	hoek = (acos(array[2]/(sqrt(array[0]*array[0]+array[1]*array[1]+array[2]*array[2]))))*(180/3.14);
+    	delay(1000000);
 	}
 }
 
