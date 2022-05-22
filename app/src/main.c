@@ -3,10 +3,6 @@
 #include <math.h>
 
 int mux = 0;
-int temperatuur = 0;
-float weerstand;
-float input;
-float voltage;
 double hoek = 0;
 
 void delay(unsigned int n){
@@ -43,7 +39,6 @@ void seg7(int n){
     //alle segmenten resetten
     GPIOA->ODR &= ~(GPIO_ODR_OD7 | GPIO_ODR_OD5);
     GPIOB->ODR &= ~(GPIO_ODR_OD0 | GPIO_ODR_OD12 | GPIO_ODR_OD15 | GPIO_ODR_OD1 | GPIO_ODR_OD2);
-
 
     if (n != 1 && n != 4){							//Segment A
         GPIOB->ODR |= GPIO_ODR_OD0;
@@ -111,7 +106,6 @@ int read_accel(int reg){
 	I2C1->TXDR = reg;//register doorsturen
 	while((I2C1->ISR & (1<<6)) == 0);
 
-
 	I2C1->CR2 |= I2C_CR2_AUTOEND_Msk;
 	I2C1->CR2 |= (1<<10);//enable read mode
 	//read
@@ -120,10 +114,7 @@ int read_accel(int reg){
 	while(!(I2C1->ISR & I2C_ISR_RXNE));
 
 	return I2C1->RXDR;
-
 }
-
-
 
 int main(void) {
 	//Klok aanzetten
@@ -138,10 +129,8 @@ int main(void) {
 	RCC->CCIPR &= ~RCC_CCIPR_ADCSEL_Msk;
 	RCC->CCIPR |= RCC_CCIPR_ADCSEL_0 | RCC_CCIPR_ADCSEL_1;
 
-
 	//Deep powerdown modus uitzetten
 	ADC1->CR &= ~ADC_CR_DEEPPWD;
-
 
 	//ADC voltage regulator aanzetten
 	ADC1->CR |= ADC_CR_ADVREGEN;
@@ -159,7 +148,6 @@ int main(void) {
 	ADC1->SMPR1 |= (ADC_SMPR1_SMP5_0 | ADC_SMPR1_SMP5_1 | ADC_SMPR1_SMP5_2); //111 traagste sample frequentie
 	ADC1->SQR1 &= ~(ADC_SQR1_L_0 | ADC_SQR1_L_1 | ADC_SQR1_L_2 | ADC_SQR1_L_3);
 	ADC1->SQR1 |= (ADC_SQR1_SQ1_2 | ADC_SQR1_SQ1_0); //00101
-
 
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
@@ -196,11 +184,6 @@ int main(void) {
 	I2C1->CR2 |= (I2C_CR2_AUTOEND | I2C_CR2_NACK);
 	I2C1->CR1 |= I2C_CR1_PE;
 
-
-
-
-
-
 	volatile int16_t array[3];
 	write_accel(1<<3,0x2D);
 	array[0] =  read_accel(0x2D);
@@ -212,20 +195,12 @@ int main(void) {
     	//I2C1->CR1 |= I2C_CR1_CRSTART;
 
     	//while(!(ADC1->ISR & ADC_ISR_EOS));
-    	float input = ADC1->DR;
-    	float voltage = (input*3.0f)/4096.0f;
-    	float weerstand = (10000.0f*voltage)/(3.0f-voltage);
-    	temperatuur = ((1.0f/((logf(weerstand/10000.0f)/3936.0f)+(1.0f/298.15f)))-273.15f)*100;
     	for (int i = 0; i<3; i++){
     		array[i] = read_accel(0x32+i*2)<<8+read_accel(0x32+i*2+1);
     	}
 
-    	int xy = sqrt(array[0]^2+array[1]^2);
-    	int xyz = sqrt(xy^2+array[2]^2);
-    	//hoek = xyz;
-
     	hoek = (acos(array[2]/(sqrt(array[0]*array[0]+array[1]*array[1]+array[2]*array[2]))))*(180/3.14);
-    	delay(1000000);
+    	delay(10000000);
 	}
 }
 
